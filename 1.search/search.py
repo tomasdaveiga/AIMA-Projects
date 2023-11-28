@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -17,7 +17,9 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
-import util
+from util import Stack
+from util import Queue
+from util import PriorityQueue
 
 class SearchProblem:
     """
@@ -70,42 +72,115 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem: SearchProblem):
-    """
-    Search the deepest nodes in the search tree first.
+    """ Search the deepest nodes in the search tree first. """
 
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
+    currentState = problem.getStartState()
+    stack = Stack()
+    nodes_visited = [currentState]
+    actions = []
 
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
+    while not problem.isGoalState(currentState):
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    print("Start: ", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+        # Get node's successors
+        nextNodes = problem.getSuccessors(currentState)
+        for i in nextNodes:
+            # Check that successors haven't already been visited
+            if i[0] not in nodes_visited:
+                stack.push((i, currentState))
 
-    currentNode = problem.getStartState()
+        # Get new node
+        currentNode = stack.pop()
+        currentState = currentNode[0][0]
+        parentNode = currentNode[1]
 
-    while(not problem.isGoalState(currentNode)):
-        problem.getSuccessors(currentNode)
+        # Check that the currentNode's parent node is the last node on the path
+        # if it's not then go back to parent node
+        if (not (nodes_visited[len(nodes_visited)-1] == parentNode)):
+            index_parent = nodes_visited.index(parentNode)
+            nodes_visited = nodes_visited[:index_parent + 1]
+            actions = actions[:index_parent]  # actions have an element less
 
-    util.raiseNotDefined()
+        # Add node to path
+        nodes_visited.append(currentState)
+        actions.append(currentNode[0][1])
+
+    return actions
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    currentState = problem.getStartState()
+    queue = Queue()
+    nodes_visited = [currentState]
+    paths = [([currentState], [])]
+    newAction = []
+
+    while not problem.isGoalState(currentState):
+        # Get node's successors
+        nextNodes = problem.getSuccessors(currentState)
+        for i in nextNodes:
+            # Check that successors haven't already been visited
+            if (i[0] not in nodes_visited):
+                queue.push((i, currentState))
+                nodes_visited.append(i[0])
+
+        # Get new node
+        if queue.isEmpty():
+            break
+        else:
+            currentNode = queue.pop()
+            currentState = currentNode[0][0]
+
+        # Get path for the node
+        for pathAction in paths:
+            if (pathAction[0][len(pathAction[0])-1] == currentNode[1]):
+                newPath = pathAction[0][:]
+                newPath.append(currentState)
+                newAction = pathAction[1].copy()
+                newAction.append(currentNode[0][1])
+                paths.append((newPath, newAction))
+                break
+
+    return newAction
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    currentState = problem.getStartState()
+    queue = PriorityQueue()
+    nodes_visited = set()
+    nodes_visited.add(currentState)
+    paths = [([currentState], [], 0)]
+
+    while (not problem.isGoalState(currentState)):
+        # Get node's successors
+        nextNodes = problem.getSuccessors(currentState)
+        for i in nextNodes:
+            # Check that successors haven't already been visited
+            if i[0] not in nodes_visited:
+                for pathAction in paths:
+                    if (pathAction[0][len(pathAction[0])-1] == currentState):
+                        queue.update((i, currentState), i[2]+pathAction[2])
+                        break
+
+        # Get new node
+        currentNode = queue.pop()
+        currentState = currentNode[0][0]
+        nodes_visited.add(currentState)
+
+        # Get path for the node
+        for pathAction in paths:
+            if (pathAction[0][len(pathAction[0])-1] == currentNode[1]):
+                newPath = pathAction[0][:]
+                newPath.append(currentState)
+                newAction = pathAction[1].copy()
+                newAction.append(currentNode[0][1])
+                cost = pathAction[2] + currentNode[0][2]
+                paths.append((newPath, newAction, cost))
+                break
+
+    return newAction
 
 def nullHeuristic(state, problem=None):
     """
@@ -116,8 +191,41 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    currentState = problem.getStartState()
+    queue = PriorityQueue()
+    nodes_visited = set()
+    nodes_visited.add(currentState)
+    paths = [([currentState], [], 0)]
+
+    while not problem.isGoalState(currentState):
+        # Get node's successors
+        nextNodes = problem.getSuccessors(currentState)
+        for i in nextNodes:
+            # Check that successors haven't already been visited
+            if i[0] not in nodes_visited:
+                for pathAction in paths:
+                    if pathAction[0][len(pathAction[0])-1] == currentState:
+                        queue.update((i, currentState), i[2]+pathAction[2] +
+                                     heuristic(i[0], problem))
+                        break
+
+        # Get new node
+        currentNode = queue.pop()
+        currentState = currentNode[0][0]
+        nodes_visited.add(currentState)
+
+        # Get path for the node
+        for pathAction in paths:
+            if (pathAction[0][len(pathAction[0])-1] == currentNode[1]):
+                newPath = pathAction[0][:]
+                newPath.append(currentState)
+                newAction = pathAction[1].copy()
+                newAction.append(currentNode[0][1])
+                cost = pathAction[2] + currentNode[0][2]
+                paths.append((newPath, newAction, cost))
+                break
+
+    return newAction
 
 
 # Abbreviations
