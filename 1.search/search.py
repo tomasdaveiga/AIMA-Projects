@@ -18,6 +18,8 @@ Pacman agents (in searchAgents.py).
 """
 
 from util import Stack
+from util import Queue
+from util import PriorityQueue
 
 class SearchProblem:
     """
@@ -73,47 +75,35 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem: SearchProblem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
+    """ Search the deepest nodes in the search tree first. """
 
     currentState = problem.getStartState()
     stack = Stack()
-    nodes_visited = []
-    nodes_visited.append(currentState)
+    nodes_visited = [currentState]
     actions = []
 
     while(not problem.isGoalState(currentState)):
 
-        # Check node has successors
+        # Get node's successors
         nextNodes = problem.getSuccessors(currentState)
-        if (not nextNodes == []):
-            for i in nextNodes:
-                # Check that successors haven't already been visited
-                if (i[0] not in nodes_visited):
-                    stack.push((i,currentState))
+        for i in nextNodes:
+            # Check that successors haven't already been visited
+            if (i[0] not in nodes_visited):
+                stack.push((i,currentState))
 
+        # Get new node
         currentNode = stack.pop()
         currentState = currentNode[0][0]
         parentNode = currentNode[1]
-        
+
         # Check that the currentNode's parent node is the last node on the path
-        # if it is then great, if it's not then delete all nodes after the parent node
+        # if it's not then go back to parent node
         if (not (nodes_visited[len(nodes_visited)-1] == parentNode)):
             index_parent = nodes_visited.index(parentNode)
             nodes_visited = nodes_visited[:index_parent + 1]
-            actions = actions[:index_parent]
+            actions = actions[:index_parent] # actions have an element less
 
+        # Add node to path
         nodes_visited.append(currentState)
         actions.append(currentNode[0][1])
 
@@ -121,7 +111,6 @@ def depthFirstSearch(problem: SearchProblem):
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem):
