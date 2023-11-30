@@ -89,40 +89,34 @@ def depthFirstSearch(problem: SearchProblem):
 
     currentState = problem.getStartState()
     stack = Stack()
-    path = []
     nodes_visited = []
+    nodes_visited.append(currentState)
     actions = []
 
     while(not problem.isGoalState(currentState)):
-        nextNodes = problem.getSuccessors(currentState)
-        parentNode = currentState
-        nodes_visited.append(parentNode)
 
-        # Check that node has successors
+        # Check node has successors
+        nextNodes = problem.getSuccessors(currentState)
         if (not nextNodes == []):
             for i in nextNodes:
                 # Check that successors haven't already been visited
                 if (i[0] not in nodes_visited):
-                    stack.push((i,parentNode))
-                else:
-                    print("already visited")
+                    stack.push((i,currentState))
 
         currentNode = stack.pop()
         currentState = currentNode[0][0]
         parentNode = currentNode[1]
-        actions.append(currentNode[0][1])
-
+        
         # Check that the currentNode's parent node is the last node on the path
         # if it is then great, if it's not then delete all nodes after the parent node
-        print("parentNode: ", parentNode)
-        print("nodes_visited[len(nodes_visited)-1]: ",nodes_visited[len(nodes_visited)-1])
         if (not (nodes_visited[len(nodes_visited)-1] == parentNode)):
-            print("Dead end")
             index_parent = nodes_visited.index(parentNode)
             nodes_visited = nodes_visited[:index_parent + 1]
-    
-    print("nodes visited: ", nodes_visited)
-    print("actions: ", actions)
+            actions = actions[:index_parent]
+
+        nodes_visited.append(currentState)
+        actions.append(currentNode[0][1])
+
     return actions
 
 def breadthFirstSearch(problem: SearchProblem):
