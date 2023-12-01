@@ -147,20 +147,26 @@ def uniformCostSearch(problem: SearchProblem):
     queue = PriorityQueue()
     nodes_visited = [currentState]
     paths = [([currentState],[],0)]
+    print("here1")
 
     while(not problem.isGoalState(currentState)):
         # Get node's successors
         nextNodes = problem.getSuccessors(currentState)
         for i in nextNodes:
             # Check that successors haven't already been visited
+            print("here2")
             if (i[0] not in nodes_visited):
-                queue.push((i,currentState),i[2])
-                nodes_visited.append(i[0])
+                for pathAction in paths:
+                    if (pathAction[0][len(pathAction[0])-1] == currentState):   
+                        print("here3")     
+                        queue.push((i,currentState),i[2]+pathAction[2])
+                        nodes_visited.append(i[0])
+                        break
         
         # Get new node
         currentNode = queue.pop()
         currentState = currentNode[0][0]
-
+        print("here4")
         # Get path for the node
         for pathAction in paths:
             if (pathAction[0][len(pathAction[0])-1] == currentNode[1]):
@@ -171,7 +177,6 @@ def uniformCostSearch(problem: SearchProblem):
                 cost = pathAction[2] + currentNode[0][2]
                 paths.append((newPath,newAction,cost))
                 break
-    print("min cost: ", min(paths, key=lambda x: x[2]))
 
     return newAction
 
