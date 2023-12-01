@@ -118,7 +118,6 @@ def breadthFirstSearch(problem: SearchProblem):
     paths = [([currentState],[])]
 
     while(not problem.isGoalState(currentState)):
-        print(currentState," is not goal.")
         # Get node's successors
         nextNodes = problem.getSuccessors(currentState)
         for i in nextNodes:
@@ -126,7 +125,6 @@ def breadthFirstSearch(problem: SearchProblem):
             if (i[0] not in nodes_visited):
                 queue.push((i,currentState))
                 nodes_visited.append(i[0])
-
         # Get new node
         currentNode = queue.pop()
         currentState = currentNode[0][0]
@@ -138,14 +136,18 @@ def breadthFirstSearch(problem: SearchProblem):
         for pathAction in paths:
             counter = counter + 1
             if (pathAction[0][len(pathAction[0])-1] == parentNode):
-                pathAction[0].append(currentState)
-                pathAction[1].append(actionState)
-                paths.append((pathAction[0],pathAction[1]))
+                newPath = pathAction[0].copy()
+                print("CurrentState: ", currentState)
+                newPath.append(currentState)
+                newAction = pathAction[1].copy()
+                newAction.append(actionState)
+                paths.append((newPath,newAction))
                 break
 
-    print("actions Returned: ", paths[counter][1])
-    print("path returned: ", paths[counter][0])
-    return paths[counter][1]
+    for pathAction in paths:
+        if(pathAction[0][len(pathAction[0])-1] == currentState):
+            return pathAction[1]
+    return []
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
