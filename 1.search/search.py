@@ -111,7 +111,6 @@ def depthFirstSearch(problem: SearchProblem):
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
-    print("Breadth First Search!")
     currentState = problem.getStartState()
     queue = Queue()
     nodes_visited = [currentState]
@@ -125,29 +124,22 @@ def breadthFirstSearch(problem: SearchProblem):
             if (i[0] not in nodes_visited):
                 queue.push((i,currentState))
                 nodes_visited.append(i[0])
+        
         # Get new node
         currentNode = queue.pop()
         currentState = currentNode[0][0]
-        actionState = currentNode[0][1]
-        parentNode = currentNode[1]
 
         # Get path for the node
-        counter = -1
         for pathAction in paths:
-            counter = counter + 1
-            if (pathAction[0][len(pathAction[0])-1] == parentNode):
-                newPath = pathAction[0].copy()
-                print("CurrentState: ", currentState)
+            if (pathAction[0][len(pathAction[0])-1] == currentNode[1]):
+                newPath = pathAction[0][:]
                 newPath.append(currentState)
                 newAction = pathAction[1].copy()
-                newAction.append(actionState)
+                newAction.append(currentNode[0][1])
                 paths.append((newPath,newAction))
                 break
 
-    for pathAction in paths:
-        if(pathAction[0][len(pathAction[0])-1] == currentState):
-            return pathAction[1]
-    return []
+    return newAction
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
