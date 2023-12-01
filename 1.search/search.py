@@ -157,8 +157,7 @@ def uniformCostSearch(problem: SearchProblem):
             print("here2")
             if (i[0] not in nodes_visited):
                 for pathAction in paths:
-                    if (pathAction[0][len(pathAction[0])-1] == currentState):   
-                        print("here3")     
+                    if (pathAction[0][len(pathAction[0])-1] == currentState):      
                         queue.push((i,currentState),i[2]+pathAction[2])
                         nodes_visited.append(i[0])
                         break
