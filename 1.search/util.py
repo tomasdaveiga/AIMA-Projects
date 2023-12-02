@@ -203,7 +203,6 @@ class PriorityQueue:
                 heapq.heapify(self.heap)
                 break
         else:
-            print("else for, item: ", item[0][0])
             self.push(item, priority)
 
 class PriorityQueueWithFunction(PriorityQueue):
