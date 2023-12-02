@@ -195,7 +195,7 @@ class PriorityQueue:
         # If item already in priority queue with equal or lower priority, do nothing.
         # If item not in priority queue, do the same thing as self.push.
         for index, (p, c, i) in enumerate(self.heap):
-            if i == item:
+            if i[0][0] == item[0][0]:
                 if p <= priority:
                     break
                 del self.heap[index]
@@ -203,6 +203,7 @@ class PriorityQueue:
                 heapq.heapify(self.heap)
                 break
         else:
+            print("else for, item: ", item[0][0])
             self.push(item, priority)
 
 class PriorityQueueWithFunction(PriorityQueue):

@@ -145,11 +145,11 @@ def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     currentState = problem.getStartState()
     queue = PriorityQueue()
-    nodes_visited = [currentState]
+    nodes_visited = set()
+    nodes_visited.add(currentState)
     paths = [([currentState],[],0)]
 
     while(not problem.isGoalState(currentState)):
-        # print("Nodes visited: ", nodes_visited)
         # Get node's successors
         nextNodes = problem.getSuccessors(currentState)
         for i in nextNodes:
@@ -157,16 +157,14 @@ def uniformCostSearch(problem: SearchProblem):
             if (i[0] not in nodes_visited):
                 for pathAction in paths:
                     if (pathAction[0][len(pathAction[0])-1] == currentState):
-                        # print("Node added to queue: ", i)
-                        # print("cost of above: ", i[2]+pathAction[2])
                         queue.update((i,currentState),i[2]+pathAction[2])
                         break
         
         # Get new node
         currentNode = queue.pop()
         currentState = currentNode[0][0]
-        nodes_visited.append(currentState)
-        # print("CurrentNode: ", currentNode)
+        nodes_visited.add(currentState)
+
         # Get path for the node
         for pathAction in paths:
             if (pathAction[0][len(pathAction[0])-1] == currentNode[1]):
@@ -177,7 +175,7 @@ def uniformCostSearch(problem: SearchProblem):
                 cost = pathAction[2] + currentNode[0][2]
                 paths.append((newPath,newAction,cost))
                 break
-    # print("Returned action: ", newAction)
+
     return newAction
 
 def nullHeuristic(state, problem=None):
