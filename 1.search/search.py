@@ -201,7 +201,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             if (i[0] not in nodes_visited):
                 for pathAction in paths:
                     if (pathAction[0][len(pathAction[0])-1] == currentState):
-                        queue.update((i,currentState),i[2]+pathAction[2])
+                        queue.update((i,currentState),i[2]+pathAction[2]+heuristic(i[0],problem))
                         break
         
         # Get new node
