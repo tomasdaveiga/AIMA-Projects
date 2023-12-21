@@ -153,6 +153,8 @@ def uniformCostSearch(problem: SearchProblem):
         # Get node's successors
         nextNodes = problem.getSuccessors(currentState)
         for i in nextNodes:
+            print("HERE")
+            print(i)
             # Check that successors haven't already been visited
             if (i[0] not in nodes_visited):
                 for pathAction in paths:

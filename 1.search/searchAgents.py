@@ -294,16 +294,18 @@ class CornersProblem(search.SearchProblem):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
+          - I think the State space will be something like: startPosition and then (false,false,false,false)
+            where the (a,b,c,d) represents whether a corner has been reached. 
+            a = bottomLeft, b = topLeft, c = topRight, d = bottomRight
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return (self.startingPosition, (False, False, False, False))
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (state[1] == (True, True, True, True))
 
     def getSuccessors(self, state: Any):
         """
@@ -325,7 +327,13 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty] :
+                successor = ((nextx, nexty), state[1])
+                successors.append((successor, action, 1)) 
+                # do I need to check if successor is corner?
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -342,6 +350,9 @@ class CornersProblem(search.SearchProblem):
             x, y = int(x + dx), int(y + dy)
             if self.walls[x][y]: return 999999
         return len(actions)
+
+def manhattanDistance(xy1, xy2):
+    return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
 
 def cornersHeuristic(state: Any, problem: CornersProblem):
@@ -360,8 +371,43 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    """ Heuristic: from current position, manhattan distance to the nearest corner that
+    hasn't been visited and then manhattan distance to the nearest non-visited corner
+    and so on?  
+    
+    1st: find unvisited corners
+    2nd: get manhattan distance to all unvisited corners
+    3rd: add the shortest distance to result
+    4th: get manhattan distance from the nearest unvisited corner to
+         all other unvisited corners
+    5th: add shortest distance to result
+    6th: repeat steps 4-5 until you don't have any unvisited corner left
+    
+    """
+    currPos = state[0]
+    cornerState = state[1]
+    pathCost = 0
+
+    # Find Unvisted Corners and compute distance from currPos
+    cornersNotVisited = []
+    cornerDistance = []
+    for i in range(4):
+        if not cornerState[i]:
+            cornersNotVisited.append(corners[i])
+
+    # Nearest Unvisited Corner to latest visited corner
+    path = [currPos]
+    while cornersNotVisited:
+        current_point = path[-1]
+
+        distances = [manhattanDistance(currPos, x) for x in cornersNotVisited]
+        min_distance_index = distances.index(min(distances))
+        next_corner = cornersNotVisited[min_disntance_index]
+        pathCost += min(distances)
+        path.append(next_corner)
+        cornersNotVisited.pop(min_disntance_index)
+
+    return pathCost
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
